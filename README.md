@@ -4,6 +4,13 @@
 
 # Agentic AutoRAG
 
+> **This is a fork** of [Agentic-Systems-Lab/Agentic-AutoRAG](https://github.com/Agentic-Systems-Lab/Agentic-AutoRAG),
+> branched from the `emnlp-neurips-camera-ready` tag. It adds what a stage-aware Bayesian
+> search method needs from the optimiser (per-question, per-stage results and a
+> retrieval-only evaluation), kept as small changes that could go back upstream. The method
+> itself lives in the [benchmark fork](https://github.com/CalumHarvey/Agentic-AutoRAG-Bench).
+> Everything else below is the upstream README.
+
 Agentic AutoRAG is a reasoning-driven optimizer for Retrieval-Augmented
 Generation (RAG) pipelines. Instead of grid search or Bayesian optimization,
 it runs a two-stage LLM agent loop: a diagnoser analyses *why* a trial
@@ -179,6 +186,13 @@ uv run agentic-autorag benchmark-evaluate \
 - **Re-running** reuses the cached corpus and `exam.json` but starts the trial
   history fresh; use `clean` for a fully cold run.
 
+## Citation
+
+This fork builds on the Agentic AutoRAG paper. Please cite it if you use this code:
+*Agentic AutoRAG: RAG Pipeline Optimization through Reasoning-Driven Agents*, NeurIPS 2026
+([listing](https://neurips.cc/virtual/2026/178981)).
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). The original copyright is kept; changes in this fork carry
+their own copyright line.
