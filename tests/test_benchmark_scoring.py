@@ -249,3 +249,49 @@ class TestLLMJudge:
         ):
             result = await llm_judge("gemini/flash", "Q?", "x", ["y"])
         assert result is None
+
+
+class TestLLMJudgeRefusal:
+    """The answer prompt's refusal sentence is graded without the judge.
+
+    A smoke trial's judge (gemini-3.5-flash-lite) graded "Insufficient information"
+    YES against the reference "no" on 8 of 26 hold-out refusals, despite the
+    prompt saying a refusal is never "no". The judge is mocked to make that mistake.
+    """
+
+    @staticmethod
+    def _judge_says(verdict: str) -> AsyncMock:
+        response = MagicMock()
+        response.choices = [MagicMock()]
+        response.choices[0].message.content = verdict
+        return AsyncMock(return_value=response)
+
+    @pytest.mark.parametrize(
+        "pred",
+        [
+            "Insufficient information",
+            "Insufficient information.",
+            "  insufficient INFORMATION. ",
+            '"Insufficient information."',
+        ],
+    )
+    async def test_refusal_is_no_answer_for_answerable_question(self, pred: str) -> None:
+        judge = self._judge_says("YES")
+        with patch("agentic_autorag.litellm_runtime.litellm.acompletion", new=judge):
+            result = await llm_judge("gemini/flash", "Does the article say X?", pred, ["no"])
+        assert result == -1
+        judge.assert_not_called()
+
+    async def test_refusal_is_correct_for_unanswerable_question(self) -> None:
+        judge = self._judge_says("NO")
+        with patch("agentic_autorag.litellm_runtime.litellm.acompletion", new=judge):
+            result = await llm_judge("gemini/flash", "Q?", "Insufficient information", ["Insufficient information."])
+        assert result == 1
+        judge.assert_not_called()
+
+    async def test_other_answers_still_go_to_the_judge(self) -> None:
+        judge = self._judge_says("NO_ANSWER")
+        with patch("agentic_autorag.litellm_runtime.litellm.acompletion", new=judge):
+            result = await llm_judge("gemini/flash", "Q?", "The context does not say.", ["no"])
+        assert result == -1
+        judge.assert_called_once()

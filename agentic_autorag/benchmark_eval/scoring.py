@@ -21,6 +21,10 @@ logger = logging.getLogger(__name__)
 # stop \b from firing after "NO" inside "NO_ANSWER".
 _JUDGE_PARSE_RE = re.compile(r"\s*(YES|NO_ANSWER|NO)(?![A-Z_])", re.IGNORECASE)
 
+# The refusal sentence ANSWER_PROMPT asks for, and the reference answer of
+# unanswerable (null_query) rows, after ``normalize_answer``.
+_REFUSAL = "insufficient information"
+
 # CONTEXT_INSUFFICIENT before CONTEXT_PRESENT is not required (no shared
 # prefix), but the negative lookahead keeps a trailing underscore/letter from
 # splitting the token.
@@ -188,7 +192,15 @@ async def llm_judge(
     internal "thinking" before emitting visible output, and any cap
     risks truncating thinking mid-stream so the visible response is
     empty. The ``timeout_s`` (default 30s) is the real cost ceiling.
+
+    The exact refusal sentence ANSWER_PROMPT asks for ("Insufficient
+    information", any case or punctuation) is graded here, without the judge:
+    YES when a reference answer is that sentence too, otherwise NO_ANSWER. Small
+    judges grade it YES against a "no" reference despite the prompt forbidding
+    it. Any other wording of a refusal still goes to the judge.
     """
+    if normalize_answer(pred) == _REFUSAL:
+        return 1 if any(normalize_answer(g) == _REFUSAL for g in gold_answers) else -1
     prompt = JUDGE_PROMPT.format(
         question=question,
         gold=" | ".join(gold_answers),
