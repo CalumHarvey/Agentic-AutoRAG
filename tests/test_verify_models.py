@@ -148,3 +148,25 @@ async def test_logs_one_line_per_model(mock_litellm, cache_path, caplog) -> None
     assert any("OK  a/x" in m for m in messages)
     assert any("OK  b/y" in m for m in messages)
     assert any("Search space verified" in m for m in messages)
+
+
+@pytest.mark.parametrize(
+    ("model", "expected_timeout"),
+    [("ollama/qwen3:8b", 180.0), ("ollama_chat/qwen3:8b", 180.0), ("a/x", 20.0)],
+)
+@patch("agentic_autorag.optimizer.verify_models.litellm")
+async def test_local_models_get_time_to_load(mock_litellm, cache_path, model, expected_timeout) -> None:
+    """A local Ollama model may first have to load from disk (about 16 s for a 7B
+    model on a 6 GB GPU, more when it must swap another model out), so it gets the
+    longer local timeout; API models keep 20 s."""
+    mock_litellm.acompletion = AsyncMock(return_value=object())
+    seen: list[float] = []
+
+    async def _wait_for(awaitable, timeout):
+        seen.append(timeout)
+        return await awaitable
+
+    with patch("agentic_autorag.optimizer.verify_models.asyncio.wait_for", new=_wait_for):
+        results = await verify_llm_endpoints([model], cache_path=cache_path)
+    assert results[0].ok
+    assert seen == [expected_timeout]

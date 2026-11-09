@@ -15,7 +15,7 @@ from typing import NamedTuple
 
 import litellm
 
-from agentic_autorag.litellm_runtime import resolve_model
+from agentic_autorag.litellm_runtime import LOCAL_LOAD_TIMEOUT_S, is_local_model, resolve_model
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +85,7 @@ async def _ping(model: str) -> tuple[bool, str]:
     visible output is empty.
     """
     target, extras = resolve_model(model)
+    timeout = LOCAL_LOAD_TIMEOUT_S if is_local_model(target) else _VERIFY_TIMEOUT_SECONDS
     try:
         await asyncio.wait_for(
             litellm.acompletion(
@@ -93,7 +94,7 @@ async def _ping(model: str) -> tuple[bool, str]:
                 max_tokens=_VERIFY_MAX_TOKENS,
                 **extras,
             ),
-            timeout=_VERIFY_TIMEOUT_SECONDS,
+            timeout=timeout,
         )
         return True, ""
     except Exception as e:  # noqa: BLE001 — any failure is a verification failure
@@ -115,7 +116,8 @@ async def verify_llm_endpoints(
 ) -> list[VerificationResult]:
     """Verify every model in ``models``. Cache the outcomes.
 
-    Concurrent pings via ``asyncio.gather`` — each ping has a 20s timeout. The
+    Concurrent pings via ``asyncio.gather`` — each ping has a 20s timeout
+    (``LOCAL_LOAD_TIMEOUT_S`` for a local Ollama model, which may have to load). The
     cache is keyed by the alias name (the value the search space holds), so
     aliased and non-aliased calls share the same cache entry as long as the
     alias-to-target map is stable.

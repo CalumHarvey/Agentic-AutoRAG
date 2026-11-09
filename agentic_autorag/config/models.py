@@ -14,6 +14,8 @@ from typing import Any, Literal
 import litellm
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from agentic_autorag.litellm_runtime import LOCAL_LOAD_TIMEOUT_S, is_local_model
+
 # Allowed difficulty tags assigned by the two-gate validator.
 DIFFICULTY_TAGS = ("easy", "medium")
 
@@ -604,10 +606,6 @@ _REASONING_UNSUPPORTED_PREFIXES = ("ollama/",)
 
 
 PROBE_TIMEOUT_S = 10
-# A local model may first have to be loaded into memory, which takes longer than an
-# API round trip (about 16 s for a 7B model on a 6 GB GPU).
-LOCAL_PROBE_TIMEOUT_S = 180
-_LOCAL_PROBE_PROVIDERS = ("ollama/", "ollama_chat/")
 
 
 def _probe_model(model: str, **extra_kwargs: Any) -> tuple[bool, str | None]:
@@ -617,7 +615,8 @@ def _probe_model(model: str, **extra_kwargs: Any) -> tuple[bool, str | None]:
     ``extra_kwargs`` are an extended-form alias's settings (``api_base``,
     ``num_ctx``, ...), sent as every real call sends them.
     """
-    timeout = LOCAL_PROBE_TIMEOUT_S if model.startswith(_LOCAL_PROBE_PROVIDERS) else PROBE_TIMEOUT_S
+    # A local model may first have to load from disk, so it gets longer than an API call.
+    timeout = LOCAL_LOAD_TIMEOUT_S if is_local_model(model) else PROBE_TIMEOUT_S
     try:
         litellm.completion(
             **extra_kwargs,

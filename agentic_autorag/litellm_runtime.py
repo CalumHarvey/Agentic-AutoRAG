@@ -25,6 +25,10 @@ _MODEL_ALIASES: dict[str, str | dict[str, Any]] = {}
 # USD per output token). Populated by ``install_local_model_prices``.
 LOCAL_MODEL_PRICES_PATH = Path(__file__).parent / "local_model_prices.json"
 LOCAL_PROVIDERS = ("ollama", "ollama_chat")
+# A local model may first have to load from disk before it answers (about 16 s for a
+# 7B model on a 6 GB GPU, more when another model must be swapped out), so model
+# checks give local models this long instead of an API round trip's timeout.
+LOCAL_LOAD_TIMEOUT_S = 180.0
 # Marks a LiteLLM catalog entry as a price we assigned, not a listing: such a model
 # still gets the live check in ``validate_llm_models``.
 SHADOW_PRICE_KEY = "shadow_price_of"
@@ -88,6 +92,11 @@ def install_local_model_prices(path: Path = LOCAL_MODEL_PRICES_PATH) -> None:
     # too, so a lookup by the id the configs use finds it.
     for model_id, entry in entries.items():
         litellm.model_cost.setdefault(model_id, entry)
+
+
+def is_local_model(model: str) -> bool:
+    """True for a LiteLLM model id served locally through Ollama (``ollama/...``)."""
+    return model.split("/", 1)[0] in LOCAL_PROVIDERS and "/" in model
 
 
 def local_model_price(model: str) -> tuple[float, float] | None:
