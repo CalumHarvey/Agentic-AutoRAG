@@ -616,6 +616,13 @@ def _probe_model(model: str) -> tuple[bool, str | None]:
 
 
 def _is_in_litellm_catalog(model: str) -> bool:
+    # A shadow price for a local model (litellm_runtime) proves nothing about whether
+    # the model is pulled, so it still gets the live check. LiteLLM may file the
+    # entry under the id with or without its provider prefix.
+    for key in (model, model.split("/", 1)[-1]):
+        entry = litellm.model_cost.get(key)
+        if entry is not None and "shadow_price_of" in entry:
+            return False
     if model in litellm.model_cost:
         return True
     if "/" in model:

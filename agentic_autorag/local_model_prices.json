@@ -1,0 +1,380 @@
+{
+  "description": "Shadow prices for models run locally through Ollama: the hosted listing at the median input price for the same model in LiteLLM's price list. Built by scripts/build_local_model_prices.py; applied by litellm_runtime.",
+  "litellm_version": "1.83.14",
+  "built": "2026-11-09",
+  "models": {
+    "llama3.2:1b": {
+      "input_per_1m_usd": 0.027,
+      "output_per_1m_usd": 0.201,
+      "priced_as": "cloudflare/@cf/meta/llama-3.2-1b-instruct",
+      "listings": [
+        {
+          "litellm_id": "novita/meta-llama/llama-3.2-1b-instruct",
+          "input_per_1m_usd": 0.02,
+          "output_per_1m_usd": 0.02
+        },
+        {
+          "litellm_id": "cloudflare/@cf/meta/llama-3.2-1b-instruct",
+          "input_per_1m_usd": 0.027,
+          "output_per_1m_usd": 0.201
+        },
+        {
+          "litellm_id": "together_ai/meta-llama/Llama-3.2-1B-Instruct",
+          "input_per_1m_usd": 0.06,
+          "output_per_1m_usd": 0.06
+        },
+        {
+          "litellm_id": "vercel_ai_gateway/meta/llama-3.2-1b",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.1
+        }
+      ]
+    },
+    "llama3.2:3b": {
+      "input_per_1m_usd": 0.04,
+      "output_per_1m_usd": 0.08,
+      "priced_as": "llamagate/llama-3.2-3b",
+      "listings": [
+        {
+          "litellm_id": "lambda_ai/llama3.2-3b-instruct",
+          "input_per_1m_usd": 0.015,
+          "output_per_1m_usd": 0.025
+        },
+        {
+          "litellm_id": "deepinfra/meta-llama/Llama-3.2-3B-Instruct",
+          "input_per_1m_usd": 0.02,
+          "output_per_1m_usd": 0.02
+        },
+        {
+          "litellm_id": "novita/meta-llama/llama-3.2-3b-instruct",
+          "input_per_1m_usd": 0.03,
+          "output_per_1m_usd": 0.05
+        },
+        {
+          "litellm_id": "llamagate/llama-3.2-3b",
+          "input_per_1m_usd": 0.04,
+          "output_per_1m_usd": 0.08
+        },
+        {
+          "litellm_id": "cloudflare/@cf/meta/llama-3.2-3b-instruct",
+          "input_per_1m_usd": 0.0509,
+          "output_per_1m_usd": 0.335
+        },
+        {
+          "litellm_id": "together_ai/meta-llama/Llama-3.2-3B-Instruct",
+          "input_per_1m_usd": 0.06,
+          "output_per_1m_usd": 0.06
+        },
+        {
+          "litellm_id": "hyperbolic/meta-llama/Llama-3.2-3B-Instruct",
+          "input_per_1m_usd": 0.12,
+          "output_per_1m_usd": 0.3
+        },
+        {
+          "litellm_id": "vercel_ai_gateway/meta/llama-3.2-3b",
+          "input_per_1m_usd": 0.15,
+          "output_per_1m_usd": 0.15
+        }
+      ]
+    },
+    "llama3.1:8b": {
+      "input_per_1m_usd": 0.05,
+      "output_per_1m_usd": 0.08,
+      "priced_as": "vercel_ai_gateway/meta/llama-3.1-8b",
+      "listings": [
+        {
+          "litellm_id": "novita/meta-llama/llama-3.1-8b-instruct",
+          "input_per_1m_usd": 0.02,
+          "output_per_1m_usd": 0.05
+        },
+        {
+          "litellm_id": "nebius/meta-llama/Meta-Llama-3.1-8B-Instruct",
+          "input_per_1m_usd": 0.02,
+          "output_per_1m_usd": 0.06
+        },
+        {
+          "litellm_id": "lambda_ai/llama3.1-8b-instruct",
+          "input_per_1m_usd": 0.025,
+          "output_per_1m_usd": 0.04
+        },
+        {
+          "litellm_id": "nscale/meta-llama/Llama-3.1-8B-Instruct",
+          "input_per_1m_usd": 0.03,
+          "output_per_1m_usd": 0.03
+        },
+        {
+          "litellm_id": "deepinfra/meta-llama/Meta-Llama-3.1-8B-Instruct",
+          "input_per_1m_usd": 0.03,
+          "output_per_1m_usd": 0.05
+        },
+        {
+          "litellm_id": "llamagate/llama-3.1-8b",
+          "input_per_1m_usd": 0.03,
+          "output_per_1m_usd": 0.05
+        },
+        {
+          "litellm_id": "vercel_ai_gateway/meta/llama-3.1-8b",
+          "input_per_1m_usd": 0.05,
+          "output_per_1m_usd": 0.08
+        },
+        {
+          "litellm_id": "cerebras/llama3.1-8b",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.1
+        },
+        {
+          "litellm_id": "ovhcloud/Llama-3.1-8B-Instruct",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.1
+        },
+        {
+          "litellm_id": "hyperbolic/meta-llama/Meta-Llama-3.1-8B-Instruct",
+          "input_per_1m_usd": 0.12,
+          "output_per_1m_usd": 0.3
+        },
+        {
+          "litellm_id": "together_ai/meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+          "input_per_1m_usd": 0.18,
+          "output_per_1m_usd": 0.18
+        },
+        {
+          "litellm_id": "perplexity/llama-3.1-8b-instruct",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        },
+        {
+          "litellm_id": "wandb/meta-llama/Llama-3.1-8B-Instruct",
+          "input_per_1m_usd": 0.22,
+          "output_per_1m_usd": 0.22
+        },
+        {
+          "litellm_id": "snowflake/llama3.1-8b",
+          "input_per_1m_usd": 0.24,
+          "output_per_1m_usd": 0.24
+        }
+      ]
+    },
+    "qwen2.5:7b": {
+      "input_per_1m_usd": 0.07,
+      "output_per_1m_usd": 0.07,
+      "priced_as": "novita/qwen/qwen2.5-7b-instruct",
+      "listings": [
+        {
+          "litellm_id": "deepinfra/Qwen/Qwen2.5-7B-Instruct",
+          "input_per_1m_usd": 0.04,
+          "output_per_1m_usd": 0.1
+        },
+        {
+          "litellm_id": "novita/qwen/qwen2.5-7b-instruct",
+          "input_per_1m_usd": 0.07,
+          "output_per_1m_usd": 0.07
+        },
+        {
+          "litellm_id": "together_ai/Qwen/Qwen2.5-7B-Instruct-Turbo",
+          "input_per_1m_usd": 0.3,
+          "output_per_1m_usd": 0.3
+        }
+      ]
+    },
+    "qwen3:4b": {
+      "input_per_1m_usd": 0.08,
+      "output_per_1m_usd": 0.24,
+      "priced_as": "nebius/Qwen/Qwen3-4B",
+      "listings": [
+        {
+          "litellm_id": "novita/qwen/qwen3-4b-fp8",
+          "input_per_1m_usd": 0.03,
+          "output_per_1m_usd": 0.03
+        },
+        {
+          "litellm_id": "nebius/Qwen/Qwen3-4B",
+          "input_per_1m_usd": 0.08,
+          "output_per_1m_usd": 0.24
+        },
+        {
+          "litellm_id": "fireworks_ai/accounts/fireworks/models/qwen3-4b",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        }
+      ]
+    },
+    "qwen3:8b": {
+      "input_per_1m_usd": 0.04,
+      "output_per_1m_usd": 0.14,
+      "priced_as": "llamagate/qwen3-8b",
+      "listings": [
+        {
+          "litellm_id": "novita/qwen/qwen3-8b-fp8",
+          "input_per_1m_usd": 0.035,
+          "output_per_1m_usd": 0.138
+        },
+        {
+          "litellm_id": "llamagate/qwen3-8b",
+          "input_per_1m_usd": 0.04,
+          "output_per_1m_usd": 0.14
+        },
+        {
+          "litellm_id": "fireworks_ai/accounts/fireworks/models/qwen3-8b",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        }
+      ]
+    },
+    "gemma3:4b": {
+      "input_per_1m_usd": 0.04,
+      "output_per_1m_usd": 0.08,
+      "priced_as": "google.gemma-3-4b-it",
+      "listings": [
+        {
+          "litellm_id": "llamagate/gemma3-4b",
+          "input_per_1m_usd": 0.03,
+          "output_per_1m_usd": 0.08
+        },
+        {
+          "litellm_id": "google.gemma-3-4b-it",
+          "input_per_1m_usd": 0.04,
+          "output_per_1m_usd": 0.08
+        },
+        {
+          "litellm_id": "deepinfra/google/gemma-3-4b-it",
+          "input_per_1m_usd": 0.05,
+          "output_per_1m_usd": 0.1
+        }
+      ]
+    },
+    "phi4-mini": {
+      "input_per_1m_usd": 0.075,
+      "output_per_1m_usd": 0.3,
+      "priced_as": "azure_ai/Phi-4-mini-instruct",
+      "listings": [
+        {
+          "litellm_id": "azure_ai/Phi-4-mini-instruct",
+          "input_per_1m_usd": 0.075,
+          "output_per_1m_usd": 0.3
+        }
+      ]
+    },
+    "mistral:7b": {
+      "input_per_1m_usd": 0.1,
+      "output_per_1m_usd": 0.15,
+      "priced_as": "llamagate/mistral-7b-v0.3",
+      "listings": [
+        {
+          "litellm_id": "ovhcloud/Mistral-7B-Instruct-v0.3",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.1
+        },
+        {
+          "litellm_id": "llamagate/mistral-7b-v0.3",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.15
+        },
+        {
+          "litellm_id": "fireworks_ai/accounts/fireworks/models/mistral-7b-instruct-v3",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        },
+        {
+          "litellm_id": "together_ai/mistralai/Mistral-7B-Instruct-v0.3",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        }
+      ]
+    },
+    "ministral-3:3b": {
+      "input_per_1m_usd": 0.1,
+      "output_per_1m_usd": 0.1,
+      "priced_as": "mistral.ministral-3-3b-instruct",
+      "listings": [
+        {
+          "litellm_id": "fireworks_ai/accounts/fireworks/models/ministral-3-3b-instruct-2512",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.1
+        },
+        {
+          "litellm_id": "mistral.ministral-3-3b-instruct",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.1
+        },
+        {
+          "litellm_id": "mistral/ministral-3-3b-2512",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.1
+        }
+      ]
+    },
+    "ministral-3:8b": {
+      "input_per_1m_usd": 0.15,
+      "output_per_1m_usd": 0.15,
+      "priced_as": "mistral/ministral-3-8b-2512",
+      "listings": [
+        {
+          "litellm_id": "mistral.ministral-3-8b-instruct",
+          "input_per_1m_usd": 0.15,
+          "output_per_1m_usd": 0.15
+        },
+        {
+          "litellm_id": "mistral/ministral-3-8b-2512",
+          "input_per_1m_usd": 0.15,
+          "output_per_1m_usd": 0.15
+        },
+        {
+          "litellm_id": "fireworks_ai/accounts/fireworks/models/ministral-3-8b-instruct-2512",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        }
+      ]
+    },
+    "granite3.3:8b": {
+      "input_per_1m_usd": 0.03,
+      "output_per_1m_usd": 0.25,
+      "priced_as": "replicate/ibm-granite/granite-3.3-8b-instruct",
+      "listings": [
+        {
+          "litellm_id": "replicate/ibm-granite/granite-3.3-8b-instruct",
+          "input_per_1m_usd": 0.03,
+          "output_per_1m_usd": 0.25
+        }
+      ]
+    },
+    "deepseek-r1:7b": {
+      "input_per_1m_usd": 0.2,
+      "output_per_1m_usd": 0.2,
+      "priced_as": "fireworks_ai/accounts/fireworks/models/deepseek-r1-distill-qwen-7b",
+      "listings": [
+        {
+          "litellm_id": "gmi/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+          "input_per_1m_usd": 0.1,
+          "output_per_1m_usd": 0.2
+        },
+        {
+          "litellm_id": "fireworks_ai/accounts/fireworks/models/deepseek-r1-distill-qwen-7b",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        },
+        {
+          "litellm_id": "nscale/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        }
+      ]
+    },
+    "deepseek-r1:8b": {
+      "input_per_1m_usd": 0.06,
+      "output_per_1m_usd": 0.09,
+      "priced_as": "novita/deepseek/deepseek-r1-0528-qwen3-8b",
+      "listings": [
+        {
+          "litellm_id": "novita/deepseek/deepseek-r1-0528-qwen3-8b",
+          "input_per_1m_usd": 0.06,
+          "output_per_1m_usd": 0.09
+        },
+        {
+          "litellm_id": "fireworks_ai/accounts/fireworks/models/deepseek-r1-0528-distill-qwen3-8b",
+          "input_per_1m_usd": 0.2,
+          "output_per_1m_usd": 0.2
+        }
+      ]
+    }
+  }
+}

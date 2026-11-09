@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
+from pathlib import Path
 from typing import Any
 
 import litellm
@@ -17,6 +19,16 @@ DEFAULT_LOGGING_WORKER_TIMEOUT_SECONDS = 300.0
 # Process-wide alias map. Empty = pure passthrough (every model name is sent
 # to LiteLLM verbatim). Populated by ``install_model_aliases``.
 _MODEL_ALIASES: dict[str, str | dict[str, Any]] = {}
+
+# Shadow prices for models run locally through Ollama (see
+# scripts/build_local_model_prices.py). LiteLLM model id -> (USD per input token,
+# USD per output token). Populated by ``install_local_model_prices``.
+LOCAL_MODEL_PRICES_PATH = Path(__file__).parent / "local_model_prices.json"
+LOCAL_PROVIDERS = ("ollama", "ollama_chat")
+# Marks a LiteLLM catalog entry as a price we assigned, not a listing: such a model
+# still gets the live check in ``validate_llm_models``.
+SHADOW_PRICE_KEY = "shadow_price_of"
+_LOCAL_PRICES: dict[str, tuple[float, float]] = {}
 
 
 def configure_litellm_runtime(model_aliases: dict[str, Any] | None = None) -> None:
@@ -36,8 +48,51 @@ def configure_litellm_runtime(model_aliases: dict[str, Any] | None = None) -> No
     # custom Azure deployment names) and add noise without surfacing actionable
     # information — the real errors still raise normally.
     litellm.suppress_debug_info = True
+    install_local_model_prices()
     if model_aliases is not None:
         install_model_aliases(model_aliases)
+
+
+def install_local_model_prices(path: Path = LOCAL_MODEL_PRICES_PATH) -> None:
+    """Charge local Ollama models the price of the same model from a hosted provider.
+
+    Reads the table built by ``scripts/build_local_model_prices.py`` and, for each
+    Ollama tag, registers ``ollama/<tag>`` and ``ollama_chat/<tag>`` with LiteLLM
+    (so code reading ``litellm.model_cost`` sees the price) and with
+    ``acompletion_with_cost`` (which charges from it directly). A local model not in
+    the table stays at $0. A missing or unreadable table logs a warning and changes
+    nothing: local models keep the prices already installed, $0 if none were.
+    """
+    try:
+        table = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        logger.warning("Local model price table %s unreadable; local models cost $0", path, exc_info=True)
+        return
+    _LOCAL_PRICES.clear()
+    entries: dict[str, dict[str, Any]] = {}
+    for tag, price in table.get("models", {}).items():
+        per_in = float(price["input_per_1m_usd"]) / 1e6
+        per_out = float(price["output_per_1m_usd"]) / 1e6
+        for provider in LOCAL_PROVIDERS:
+            model_id = f"{provider}/{tag}"
+            _LOCAL_PRICES[model_id] = (per_in, per_out)
+            entries[model_id] = {
+                "input_cost_per_token": per_in,
+                "output_cost_per_token": per_out,
+                "litellm_provider": provider,
+                "mode": "chat",
+                SHADOW_PRICE_KEY: price.get("priced_as"),
+            }
+    litellm.register_model(entries)
+    # register_model files ``ollama/<tag>`` under the bare tag; keep the prefixed id
+    # too, so a lookup by the id the configs use finds it.
+    for model_id, entry in entries.items():
+        litellm.model_cost.setdefault(model_id, entry)
+
+
+def local_model_price(model: str) -> tuple[float, float] | None:
+    """USD per input and output token for a shadow-priced local model, else None."""
+    return _LOCAL_PRICES.get(model)
 
 
 def install_model_aliases(aliases: dict[str, Any]) -> None:
@@ -139,11 +194,17 @@ async def acompletion_with_cost(
     prompt_tokens = int(getattr(usage_obj, "prompt_tokens", 0) or 0) if usage_obj is not None else 0
     completion_tokens = int(getattr(usage_obj, "completion_tokens", 0) or 0) if usage_obj is not None else 0
     cache_read, cache_creation = _extract_cache_tokens(usage_obj)
-    try:
-        usd = float(litellm.completion_cost(completion_response=response) or 0.0)
-    except Exception:
-        usd = 0.0
-        logger.debug("completion_cost failed for model=%s", resolved_model, exc_info=True)
+    local_price = local_model_price(resolved_model)
+    if local_price is not None:
+        # Priced from the table, not completion_cost: Ollama's response does not
+        # always carry the provider-prefixed model id the catalog is keyed by.
+        usd = prompt_tokens * local_price[0] + completion_tokens * local_price[1]
+    else:
+        try:
+            usd = float(litellm.completion_cost(completion_response=response) or 0.0)
+        except Exception:
+            usd = 0.0
+            logger.debug("completion_cost failed for model=%s", resolved_model, exc_info=True)
     logger.debug(
         "LLM call: model=%s (alias=%s) category=%s prompt_tokens=%d completion_tokens=%d "
         "cache_read=%d cache_creation=%d cost=$%.6f",
