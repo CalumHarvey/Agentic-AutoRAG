@@ -1860,6 +1860,33 @@ class TestValidateLlmModels:
         assert "cloud/fake-a" in err_str
         assert "cloud/fake-b" in err_str
 
+    def test_probe_sends_extended_alias_settings(self) -> None:
+        """An extended-form alias's settings reach the probe call, as they reach real calls."""
+        from unittest.mock import patch
+
+        with patch("agentic_autorag.config.models._probe_model", return_value=(True, None)) as probe:
+            ProjectConfig.model_validate(
+                {
+                    "model_aliases": {
+                        "newprovider/some-model": {
+                            "model": "newprovider/some-model-1",
+                            "api_base": "http://localhost:9999",
+                            "num_ctx": 8192,
+                        }
+                    },
+                    "agent": {
+                        "optimizer_model": "anthropic/claude-haiku-4-5-20251001",
+                        "examiner_model": "anthropic/claude-haiku-4-5-20251001",
+                        "judge_model": "anthropic/claude-haiku-4-5-20251001",
+                    },
+                    "search_space": {
+                        "embedding": {"models": ["sentence-transformers/all-MiniLM-L6-v2"]},
+                        "generator": {"models": ["newprovider/some-model"]},
+                    },
+                }
+            )
+        probe.assert_called_once_with("newprovider/some-model-1", api_base="http://localhost:9999", num_ctx=8192)
+
 
 class TestReasoningTrialConfig:
     def test_reasoning_defaults_to_false(self) -> None:

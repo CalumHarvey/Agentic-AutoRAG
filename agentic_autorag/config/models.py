@@ -603,13 +603,29 @@ class GraphRetrievalSearchSpace(BaseModel):
 _REASONING_UNSUPPORTED_PREFIXES = ("ollama/",)
 
 
-def _probe_model(model: str) -> tuple[bool, str | None]:
+PROBE_TIMEOUT_S = 10
+# A local model may first have to be loaded into memory, which takes longer than an
+# API round trip (about 16 s for a 7B model on a 6 GB GPU).
+LOCAL_PROBE_TIMEOUT_S = 180
+_LOCAL_PROBE_PROVIDERS = ("ollama/", "ollama_chat/")
+
+
+def _probe_model(model: str, **extra_kwargs: Any) -> tuple[bool, str | None]:
     """Live-test a model by making a minimal completion call.
 
     Called only for models that fail the static LiteLLM catalog check.
+    ``extra_kwargs`` are an extended-form alias's settings (``api_base``,
+    ``num_ctx``, ...), sent as every real call sends them.
     """
+    timeout = LOCAL_PROBE_TIMEOUT_S if model.startswith(_LOCAL_PROBE_PROVIDERS) else PROBE_TIMEOUT_S
     try:
-        litellm.completion(model=model, messages=[{"role": "user", "content": "ping"}], max_tokens=1, timeout=10)
+        litellm.completion(
+            **extra_kwargs,
+            model=model,
+            messages=[{"role": "user", "content": "ping"}],
+            max_tokens=1,
+            timeout=timeout,
+        )
         return True, None
     except Exception as e:  # noqa: BLE001
         return False, str(e)
@@ -1197,6 +1213,13 @@ class ProjectConfig(BaseModel):
             return name
         return target if isinstance(target, str) else target["model"]
 
+    def alias_kwargs(self, name: str) -> dict[str, Any]:
+        """Extra call settings of an extended-form alias (everything but ``model``), else empty."""
+        target = self.model_aliases.get(name)
+        if not isinstance(target, dict):
+            return {}
+        return {k: v for k, v in target.items() if k != "model"}
+
     @model_validator(mode="after")
     def validate_llm_models(self) -> ProjectConfig:
         """Validate that every llm_model is callable by LiteLLM.
@@ -1222,7 +1245,7 @@ class ProjectConfig(BaseModel):
         failed: list[str] = []
         errors: list[str] = []
         for display, target in needs_probe:
-            ok, err = _probe_model(target)
+            ok, err = _probe_model(target, **self.alias_kwargs(display))
             if not ok:
                 label = display if display == target else f"{display} (→ {target})"
                 failed.append(label)
